@@ -15,7 +15,7 @@ export default function ShelterList({lat=0, lng=0}) {
 
     let state = location.state;
     console.log(state);
-    const shelterUri = `http://localhost:8080/shelter/지진-옥외/${nowLat}/${nowLng}/1/40000`;
+    const shelterUri = `http://localhost:8080/shelter/지진-옥외/${nowLat}/${nowLng}/1/400000`;
 
     useEffect(() => {
         fetch(shelterUri)
@@ -41,36 +41,15 @@ export default function ShelterList({lat=0, lng=0}) {
         )
     }
 
-    return <>
-        <table>
-            <thead>
-                <tr>
-                    <th>장소명</th>
-                    <th>주소</th>
-                    <th>용도</th>
-                    <th>displayLV</th>
-                </tr>
-            </thead>
-            <tbody>
-                <Fetch uri={shelterUri} renderSuccess={RenderSuccess} />
-            </tbody>
-        </table>
-    </>
+    return <Fetch uri={shelterUri} renderSuccess={RenderSuccess} />
+
     function RenderSuccess(shelterList) {
         return shelterList.map(shelter => (
-            <>
             <EventMarkerContainer
                 key={`EventMarkerContainer-${shelter.shelterId.lat}-${shelter.shelterId.lng}`}
                 position={shelter.shelterId}
                 content={shelter.name}
             />
-                <tr>
-                    <td>{shelter.name}</td>
-                    <td>{shelter.addr}</td>
-                    <td>{shelter.usageType}</td>
-                    <td>{shelter.displayLevel}</td>
-                </tr>
-            </>
         ))
     }
 }

@@ -3,6 +3,7 @@ import { useMap } from '@uidotdev/usehooks';
 import { Map, MapMarker } from 'react-kakao-maps-sdk';
 import Button from 'react-bootstrap/Button';
 import ShelterList from 'components/shelter/ShelterList';
+import GlobalStyle from 'style/GlobalStyle';
 
 const MapContainer = ({}) => {
     const { kakao } = window;
@@ -25,17 +26,16 @@ const MapContainer = ({}) => {
         console.log(error);
     };
 
-    // const getAddress = (lat, lng) => {
-    //     const geocoder = new kakao.maps.services.Geocoder(); // 좌표 -> 주소로 변환해주는 객체
-    //     const coord = new kakao.maps.LatLng(location.latitude, location.longitude); // 주소로 변환할 좌표 입력
-    //     const callback = function (result, status) {
-    //         if (status === kakao.maps.services.Status.OK) {
-    //             setAddress(result[0].address);
-    //         }
-    //     };
-    //     geocoder.coord2Address(coord.getLng(), coord.getLat(), callback);
-    // };
-
+    const getAddress = (lat, lng) => {
+        const geocoder = new kakao.maps.services.Geocoder(); // 좌표 -> 주소로 변환해주는 객체
+        const coord = new kakao.maps.LatLng(geoLocation.latitude, geoLocation.longitude); // 주소로 변환할 좌표 입력
+        const callback = function (result, status) {
+            if (status === kakao.maps.services.Status.OK) {
+                setAddress(result[0].address);
+            }
+        };
+        geocoder.coord2Address(coord.getLng(), coord.getLat(), callback);
+    };
 
     return (
         <>
@@ -51,11 +51,30 @@ const MapContainer = ({}) => {
                         lat: geoLocation.latitude,
                         lng: geoLocation.longitude
                     }}
+                    image={{
+                        src: "https://cdn.icon-icons.com/icons2/317/PNG/512/map-marker-icon_34392.png",
+                        size: {
+                            width: 64,
+                            height: 69,
+                        },
+                        options: {
+                            offset: {
+                                x: 27,
+                                y: 69,
+                            },
+                        },
+                    }}
                     clickable={true}
                     onMouseOver={() => setIsOpen(true)}
                     onMouseOut={() => setIsOpen(false)}
                 >
-                    {isOpen && <div style={{ padding: "10px", color: "#000"}}>내 위치</div>}
+
+                    {isOpen && 
+                        <>
+                        <GlobalStyle />
+                        <div style={{ padding: "10px", color: "#000"}}>내 위치</div>
+                        </>
+                    }
                 </MapMarker>
                 </Map>
             </>
