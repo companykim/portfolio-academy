@@ -3,6 +3,7 @@ import { createGlobalStyle } from "styled-components";
 const CustomOverlay2Style = createGlobalStyle `
     .overlaybox {
         background: white;
+         
     }
     .boxtitle {
         box-sizing: border-box;

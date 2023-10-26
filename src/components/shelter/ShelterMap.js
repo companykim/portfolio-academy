@@ -5,6 +5,7 @@ import ShelterMarkers from './ShelterMarkers';
 
 export default function ShelterMap() {
   const { kakao } = window;
+  const [isOpen, setIsOpen] = useState(false);
   const [curPos, setCurPos] = useState(null); // 현재 위치를 저장할 상태
   const [address, setAddress] = useState(null);
   const [zoomLvl, setZoomLvl] = useState(3);  //1:코앞에 20M, 2:30M, 50M, 100M, 250M, 500M, 1KM, 2KM, 4KM, 8KM, 16KM, 32KM, 13:64KM, 14 128KM 동북아
@@ -27,16 +28,16 @@ export default function ShelterMap() {
     console.log("geoLocError = ", err)
   }
 
-  const getAddress = (lat, lng) => {
-    const geocoder = new kakao.maps.services.Geocoder(); // 좌표 -> 주소로 변환해주는 객체
-    const coord = new kakao.maps.LatLng(curPos.latitude, curPos.longitude); // 주소로 변환할 좌표 입력
-    const callback = function (result, status) {
-        if (status === kakao.maps.services.Status.OK) {
-            setAddress(result[0].address);
-        }
-    };
-    geocoder.coord2Address(coord.getLng(), coord.getLat(), callback);
-};
+//   const getAddress = (lat, lng) => {
+//     const geocoder = new kakao.maps.services.Geocoder(); // 좌표 -> 주소로 변환해주는 객체
+//     const coord = new kakao.maps.LatLng(curPos.latitude, curPos.longitude); // 주소로 변환할 좌표 입력
+//     const callback = function (result, status) {
+//         if (status === kakao.maps.services.Status.OK) {
+//             setAddress(result[0].address);
+//         }
+//     };
+//     geocoder.coord2Address(coord.getLng(), coord.getLat(), callback);
+// };
 
   return (
     <>
@@ -60,10 +61,14 @@ export default function ShelterMap() {
               lat: curPos.latitude,
               lng: curPos.longitude
             }}
+            clickable={true}
+            onClick={() => setIsOpen(true)}
           />
-        <ShelterMarkers center={curPos} zoomLvl={zoomLvl} scale={50}/>
 
-          <CustomOverlayMap // 커스텀 오버레이를 표시할 Container
+          <ShelterMarkers center={curPos} zoomLvl={zoomLvl} scale={50}/>  
+          
+          {isOpen && (
+            <CustomOverlayMap // 커스텀 오버레이를 표시할 Container
             // 커스텀 오버레이가 표시될 위치입니다
             position={{
               lat: curPos.latitude,
@@ -72,14 +77,14 @@ export default function ShelterMap() {
             // 커스텀 오버레이가에 대한 확장 옵션
             xAnchor={0.3}
             yAnchor={0.91}
-          >
+            >
             <div className="overlaybox">
               <div className="boxtitle">내 위치</div>
               <div className="locAddr">
                 <div className="locAddr_text">gth</div>
               </div>
             </div>
-          </CustomOverlayMap>
+          </CustomOverlayMap> )}
         </Map>
       }
     </>
