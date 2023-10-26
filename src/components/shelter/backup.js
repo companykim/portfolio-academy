@@ -9,17 +9,17 @@ function ShelterMarkers({ center, zoomLvl, scale }) {
     const shelterUri = `http://localhost:8080/shelter/지진/${center.latitude}/${center.longitude}/${displayLevel}/${halfBoundary}`;
     const [isOpen, setIsOpen] = useState(false)
     
-    const EventMarkerContainer = ({ position}) => {
-        // const [isVisible, setIsVisible] = useState(false)
+    const EventMarkerContainer = ({ position, content }) => {
+        const [isVisible, setIsVisible] = useState(false)
 
         return (
             <MapMarker
                 position={position}
                 onClick={() => setIsOpen(true)}
-                //onMouseOver={() => setIsVisible(true)}
-                //onMouseOut={() => setIsVisible(false)}
+                onMouseOver={() => setIsVisible(true)}
+                onMouseOut={() => setIsVisible(false)}
             >
-                {/*isVisible && content*/}
+                {isVisible && content}
             </MapMarker>
         )
     }
@@ -28,7 +28,6 @@ function ShelterMarkers({ center, zoomLvl, scale }) {
 
     function RenderSuccess(shelterList) {
         return shelterList.map(shelter => (
-            <>
             <EventMarkerContainer
                 position={shelter.shelterId} 
                 /**
@@ -37,9 +36,7 @@ function ShelterMarkers({ center, zoomLvl, scale }) {
                  *          lng: shelter.shelterId.lng    
                  *      }}
                  */
-            />
-                {isOpen && (
-                    <CustomOverlayMap
+                content = {<CustomOverlayMap
                         position={{
                             lat: shelter.shelterId.lat,
                             lng: shelter.shelterId.lng
@@ -54,8 +51,8 @@ function ShelterMarkers({ center, zoomLvl, scale }) {
                             <div className="locAddr_text">{shelter.addr}</div>
                         </div>
                     </div>
-                </CustomOverlayMap> )}
-            </>
+                </CustomOverlayMap>}
+            />
         ))
     }
 
