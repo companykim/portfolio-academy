@@ -8,43 +8,52 @@ function ShelterMarkers({ center, zoomLvl, scale }) {
     const halfBoundary = scale * 10000
     const shelterUri = `http://localhost:8080/shelter/지진/${center.latitude}/${center.longitude}/${displayLevel}/${halfBoundary}`;
     const [isOpen, setIsOpen] = useState(false)
+    
+    const EventMarkerContainer = ({ position, content}) => {
+        const [isVisible, setIsVisible] = useState(false)
 
-    function renderSuccess(shelterList) {
-        return <>
-            {shelterList?.map(shelter => (
-                <>
-                <MapMarker // 현재 위치 표시
+        return (
+            <MapMarker
+                position={position}
+                onClick={() => setIsOpen(true)}
+                onMouseOver={() => setIsVisible(true)}
+                onMouseOut={() => setIsVisible(false)}
+            >
+                {isVisible && content}
+            </MapMarker>
+        )
+    }
+
+    return <Fetch uri={shelterUri} renderSuccess={RenderSuccess} />
+
+    function RenderSuccess(shelterList) {
+        return shelterList.map(shelter => (
+            <>
+            <EventMarkerContainer
+                position={shelter.shelterId} 
+                content = {
+                <CustomOverlayMap
                     position={{
                         lat: shelter.shelterId.lat,
                         lng: shelter.shelterId.lng
                     }}
-                    onClick={() => setIsOpen(true)}
-                />
-                {isOpen && (
-                    <CustomOverlayMap
-                        position={{
-                            lat: shelter.shelterId.lat,
-                            lng: shelter.shelterId.lng
-                        }}
-                        xAnchor={0.3}
-                        yAnchor={0.91}
-                    >
+                    xAnchor={0.3}
+                    yAnchor={0.91}
+                >
 
-                        <div className="overlaybox">
-                            <div className="boxtitle">{shelter.name}</div>
-                            <div className="locAddr">
-                            <div className="locAddr_text">{shelter.addr}</div>
-                        </div>
+                    <div className="overlaybox">
+                        <div className="boxtitle">{shelter.name}</div>
+                        <div className="locAddr">
+                        <div className="locAddr_text">{shelter.addr}</div>
                     </div>
-                </CustomOverlayMap> )}
-                </>
-            ))}
-        </>
+                </div>
+            </CustomOverlayMap> }
+            />
+
+            </>
+        ))
     }
 
-    return (
-        <Fetch uri={shelterUri} renderSuccess={renderSuccess} />
-    );
 }
 
 export default ShelterMarkers;
