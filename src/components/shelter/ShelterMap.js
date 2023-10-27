@@ -123,7 +123,6 @@ export default function ShelterMap() {
         )
     }
 
-
     return (
         <>
             <CustomOverlay2Style />
@@ -137,7 +136,7 @@ export default function ShelterMap() {
                     style={{
                         // 지도의 크기
                         width: "100%",
-                        height: "450px",
+                        height: "600px",
                     }}
                     level={zoomLv} // 지도의 확대 레벨
 
@@ -160,7 +159,8 @@ export default function ShelterMap() {
                         }}
                         clickable={true}
                         removable={true}
-                        onClick={() => setIsOpen(!isOpen)}
+                        onMouseOver={() => setIsOpen(true)}
+                        onMouseOut={() => setIsOpen(false)}
                     >
                         {isOpen && (<div style={{ minWidth: "150px" }}>
                             <img
