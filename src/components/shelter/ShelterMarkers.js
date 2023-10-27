@@ -1,56 +1,54 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
+import { MapMarker, CustomOverlayMap } from 'react-kakao-maps-sdk';
 import { Fetch } from 'toolbox/Fetch';
-import { Map, MapMarker, CustomOverlayMap } from "react-kakao-maps-sdk"
-import CustomOverlay2Style from 'style/CustomOverlay2Style';
 
-function ShelterMarkers({ center, zoomLvl, scale }) {
-    const displayLevel = zoomLvl * parseInt(100 / 14)
-    const halfBoundary = scale * 10000
-    const shelterUri = `http://localhost:8080/shelter/지진/${center.latitude}/${center.longitude}/${displayLevel}/${halfBoundary}`;
-    const [target, setTarget] = useState(-1)
-    
+function ShelterMarkers({ center, zoomLv, scale }) {
+    const displayLv = zoomLv * parseInt(100 / 14)
+    const halfBoundary = scale * 100000
+    const shelterUri = `http://localhost:8080/shelter/지진-옥외/${center.latitude}/${center.longitude}/${displayLv}/${halfBoundary}`;
+
+    const [target, setTarget] = useState(0)
+
     function RenderSuccess(shelterList) {
         return <>
             {shelterList?.map((shelter, index) => (
                 <>
-                <MapMarker // 현재 위치 표시
-                    position={shelter.shelterId}
-                    onClick={() => setTarget(index)}
+                    <MapMarker
+                        position={shelter.shelterId}
+                        onClick={() => setTarget(index)}
+                        removable={true}
+                        clickable={true}
+                        image={{
+                            src: "https://cdn-icons-png.flaticon.com/128/4467/4467108.png", // 마커이미지의 주소
+                            size: {
+                                width: 40,
+                                height: 40,
+                            } // 마커이미지의 크기입니다
+                        }}
                     />
                 </>
             ))}
             {shelterList?.filter((shelter, idx) => idx === target).map(shelter => (
                 <CustomOverlayMap
-                position={{
-                    lat: shelter.shelterId.lat,
-                    lng: shelter.shelterId.lng
-                }}
-                xAnchor={0.3}
-                yAnchor={0.91}
-            >
-                <div className="overlaybox">
-                    <div className="boxtitle">{shelter.name}</div>
-                    <div className="locAddr">
-                        <div className="locAddr_text">{shelter.addr}</div>
+                    position={shelter.shelterId}
+                    xAnchor={0.3}
+                    yAnchor={0.5}
+                >
+                    <div class="overlaybox">
+                        <div class="info">
+                            <div class="title">
+                                {shelter.name}
+                                <div class="close" onClick={() => setTarget(false)} title="닫기"></div>
+                            </div>
+                            <div class="body">
+                                <div class="desc">
+                                    <div class="ellipsis">{shelter.addr}</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-        </CustomOverlayMap>
+                </CustomOverlayMap>
             ))}
-
-
-
-
-
-
-
-
-
-
-
-
-
-            {/*{target && (
-                     )}*/}
         </>
     }
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Map, MapMarker, CustomOverlayMap } from "react-kakao-maps-sdk"
-import CustomOverlay2Style from 'style/CustomOverlay2Style';
+import CustomOverlayStyle from 'style/CustomOverlayStyle';
 import ShelterMarkers from './ShelterMarkers';
 import { Polyline } from 'react-kakao-maps-sdk';
 import CalculatePolylineDistanceStyle from 'style/CalculatePolylineDistanceStyle';
@@ -126,7 +126,7 @@ export default function ShelterMap() {
 
     return (
         <>
-            <CustomOverlay2Style />
+            <CustomOverlayStyle />
             {curPos && <>
                 <Map // 지도를 표시할 Container
                     center={{
@@ -137,7 +137,7 @@ export default function ShelterMap() {
                     style={{
                         // 지도의 크기
                         width: "100%",
-                        height: "450px",
+                        height: "800px",
                     }}
                     level={zoomLv} // 지도의 확대 레벨
 
