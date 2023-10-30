@@ -188,6 +188,7 @@ export default function ShelterMap() {
                     </ShelterMarkers>
 
                     {/* // 선의 거리 계산하기 */}
+                    {calcDist && <> 
                     <CalculatePolylineDistanceStyle />
                     <Polyline
                         path={paths}
@@ -242,6 +243,7 @@ export default function ShelterMap() {
                             </div>
                         </CustomOverlayMap>
                     )}
+                    </>}
                     <button onClick={distToggle}>거리재기</button>
                 </Map>
             </>
