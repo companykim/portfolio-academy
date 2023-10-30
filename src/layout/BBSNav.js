@@ -1,39 +1,19 @@
-import React, { useContext } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Fetch } from 'toolbox/Fetch';
-import LoginModal from 'components/LoginModal';
-import AppContext from "context/AppContextProvider";
+import React from 'react';
+import {Navbar, Nav, Container} from 'react-bootstrap';
 
 export default function BBSNav() {
-    const boardListUri = `http://localhost:8080/bb/anonymous/listAll`;
-    const { auth } = useContext(AppContext);
-    const isManager = auth?.roles?.includes("manager");
-
     return (
-        <header>
-            <Link to="/">Home</Link>
-            &nbsp;&nbsp;|
-            <Fetch uri={boardListUri} renderSuccess={renderSuccess} />
-            {isManager ? <Link key="dfhdefh" to={`/member-list/0001`}>
-                회원목록
-            </Link> : ""}
-            
-            <Link key='아직못정함ㅋㅋ' to={`/shelter`}>
-                &nbsp;&nbsp;대피소 안내&nbsp;
-            </Link>
-            <LoginModal />
-        </header>
+        <Navbar bg="primary" data-bs-theme="dark">
+          <Container align="center">
+            <Navbar.Brand href="/">대피소 안내해드려요</Navbar.Brand>
+            <Nav className="mc-auto">
+              <Nav.Link href="/">Home</Nav.Link>
+              <Nav.Link href="/shelter">대피소 안내</Nav.Link>
+              <Nav.Link href="/manual">대피요령</Nav.Link>
+              <Nav.Link href="/makers">만든이</Nav.Link>
+            </Nav>
+          </Container>
+        </Navbar>
     );
-
-    function renderSuccess(boardList) {
-        return <>
-            {boardList.map(board => (
-                <Link key={board.id} to={`/board`}
-                    state={{ boardId: board.id, page: 1 }}>
-                    &nbsp;&nbsp;{board.name}&nbsp;
-                </Link>
-            ))}
-        </>
-    }
 
 }

@@ -8,6 +8,8 @@ import Register from 'components/Register';
 import MemberList from 'components/MemberList';
 import PostMng from 'components/post/PostMng';
 import ShelterMap from 'components/shelter/ShelterMap';
+import Makers from 'components/Makers';
+import Manual from 'components/post/Manual';
 
 function BBSRouter() {
     return (
@@ -19,6 +21,8 @@ function BBSRouter() {
             <Route path="/sign-up" element={<Register />} />
             <Route path="/member-list/:ownerId" element={<MemberList />} />
             <Route path="/shelter" element={<ShelterMap />} />
+            <Route path="/manual" element={<Manual />} />
+            <Route path="/makers" element={<Makers />} />
         </Routes>
     );
 }
