@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Map, MapMarker, CustomOverlayMap } from "react-kakao-maps-sdk"
+import { Map, MapMarker, CustomOverlayMap, MapTypeId } from "react-kakao-maps-sdk"
 import CustomOverlay2Style from 'style/CustomOverlay2Style';
 import ShelterMarkers from './ShelterMarkers';
 import { Polyline } from 'react-kakao-maps-sdk';
@@ -144,6 +144,7 @@ export default function ShelterMap() {
                     onRightClick={handleRightClick}
                     onMouseMove={handleMouseMove}
                 >
+                    <MapTypeId type={"TRAFFIC"} />
                     {/* 내위치 표시 */}
                     <MapMarker
                         position={{

@@ -42,7 +42,17 @@ function ShelterMarkers({ center, zoomLv, scale }) {
                             </div>
                             <div class="body">
                                 <div class="desc">
-                                    <div class="ellipsis">{shelter.addr}</div>
+                                    <div class="ellipsis">
+                                        {shelter.addr} <br/>
+                                        <a
+                                            href={`https://map.kakao.com/link/to/${shelter.name},${shelter.shelterId.lat},${shelter.shelterId.lng}`}
+                                            style={{ color: "blue" }}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                        >
+                                            길찾기
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
