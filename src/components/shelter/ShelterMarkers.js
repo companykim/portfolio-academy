@@ -36,13 +36,13 @@ function ShelterMarkers({ center, zoomLv, scale }) {
                 >
                     <div class="overlaybox">
                         <div class="info">
-                            <div class="title">
+                            <div class="title" align="center">
                                 {shelter.name}
                                 <div class="close" onClick={() => setTarget(false)} title="닫기"></div>
                             </div>
                             <div class="body">
                                 <div class="desc">
-                                    <div class="ellipsis">
+                                    <div class="ellipsis" align="center">
                                         {shelter.addr} <br/>
                                         <a
                                             href={`https://map.kakao.com/link/to/${shelter.name},${shelter.shelterId.lat},${shelter.shelterId.lng}`}
