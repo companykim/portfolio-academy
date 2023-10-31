@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { MapMarker, CustomOverlayMap } from 'react-kakao-maps-sdk';
 import { Fetch } from 'toolbox/Fetch';
 
-function ShelterMarkers({ center, zoomLv, scale }) {
+export default function ShelterMarkers_ivar({ center, zoomLv, scale }) {
     const displayLv = zoomLv * parseInt(100 / 14)
     const halfBoundary = scale * 100000
     const shelterUri = `http://localhost:8080/shelter/지진-옥외/${center.latitude}/${center.longitude}/${displayLv}/${halfBoundary}`;
@@ -10,7 +10,8 @@ function ShelterMarkers({ center, zoomLv, scale }) {
     const [target, setTarget] = useState(0)
 
     function RenderSuccess(shelterList) {
-        return <>
+        return (
+        <>
             {shelterList?.map((shelter, index) => (
                 <>
                     <MapMarker
@@ -60,11 +61,9 @@ function ShelterMarkers({ center, zoomLv, scale }) {
                 </CustomOverlayMap>
             ))}
         </>
+        )
     }
-
     return (
         <Fetch uri={shelterUri} renderSuccess={RenderSuccess} />
     );
 }
-
-export default ShelterMarkers;

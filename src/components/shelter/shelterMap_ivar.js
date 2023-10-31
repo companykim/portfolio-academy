@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Map, Polyline, MapMarker, MapInfoWindow, CustomOverlayMap } from "react-kakao-maps-sdk"
-import CustomOverlay2Style from 'style/CustomOverlay2Style';
+import CustomOverlayStyle from 'style/CustomOverlayStyle';
 import ShelterMarkers from './ShelterMarkers';
 /**
  * 
  */
-export default function ShelterMap() {
+export default function ShelterMap_ivar() {
   const [curPos, setCurPos] = useState(null); // 현재 위치를 저장할 상태
-  const [zoomLv, setZoomLv] = useState(3);  //1:코앞에 20M, 2:30M, 50M, 100M, 250M, 500M, 1KM, 2KM, 4KM, 8KM, 16KM, 32KM, 13:64KM, 14 128KM 동북아
-  const [isOpen, setIsOpen] = useState(false);
+  const [zoomLvl, setZoomLvl] = useState(3);  //1:코앞에 20M, 2:30M, 50M, 100M, 250M, 500M, 1KM, 2KM, 4KM, 8KM, 16KM, 32KM, 13:64KM, 14 128KM 동북아
 
   // 현재 위치를 ShelterMap을 생성할 때 준비해 줍니다.
   useEffect(() => {
@@ -29,6 +28,8 @@ export default function ShelterMap() {
   const [pathJustAdded, setPathJustAdded] = useState(false)
 
   const [path, setPath] = useState([])
+  const [pathMovingPt, setPathMovingPt] = useState(null)
+
 
   const calcDistToggle = (e) => {
     e.preventDefault();
@@ -43,24 +44,10 @@ export default function ShelterMap() {
       return
     }
     //경로에 추가
-    if (pathJustAdded) {
-      setPath((prev) => [
-        ...prev,
-        {
+    setPathMovingPt(  {
           lat: mouseEvent.latLng.getLat(),
           lng: mouseEvent.latLng.getLng(),
-        },
-      ])
-      setPathJustAdded(false)
-    } else {
-      setPath((prev) => [
-        ...prev.slice(0, -1),
-        {
-          lat: mouseEvent.latLng.getLat(),
-          lng: mouseEvent.latLng.getLng(),
-        },
-      ])
-      }
+        })
   }
 
   // switchCalcDist로 설정되어 있으면 클릭한 위치를 바탕으로 경로 추가
@@ -70,27 +57,18 @@ export default function ShelterMap() {
     }
     console.log("경로에 모인 지점은...", path)
     //경로에 추가
-    if (path.length === 0) {
-      setPath(
-        [{
-          lat: mouseEvent.latLng.getLat(),
-          lng: mouseEvent.latLng.getLng(),
-        }])
-    } else {
       setPath((prev) => [
-        ...prev.slice(0, prev.length - 1),
+        ...prev,
         {
           lat: mouseEvent.latLng.getLat(),
           lng: mouseEvent.latLng.getLng(),
         },
       ])
     }
-    setPathJustAdded(true)
-  }
 
   return (
     <>
-      <CustomOverlay2Style />
+      <CustomOverlayStyle />
       {curPos &&
         <Map // 지도를 표시할 Container
           center={{
@@ -103,7 +81,7 @@ export default function ShelterMap() {
             width: "100%",
             height: "450px",
           }}
-          level={zoomLv}
+          level={zoomLvl}
           onClick={addPath}
           onMouseMove={handleMove4Path}
         >
@@ -112,42 +90,11 @@ export default function ShelterMap() {
               lat: curPos.latitude,
               lng: curPos.longitude
             }}
-            image={{
-                src: "https://cdn-icons-gif.flaticon.com/12589/12589164.gif", // 마커이미지의 주소
-                size: {
-                    width: 50,
-                    height: 50,
-                } // 마커이미지의 크기입니다
-            }}
-            clickable={true}
-            removable={true}
-            onMouseOver={() => setIsOpen(true)}
-            onMouseOut={() => setIsOpen(false)}
-          >
-        {isOpen && (<div style={{ minWidth: "150px" }}>
-            <img
-                alt="close"
-                width="14"
-                height="13"
-                src="https://t1.daumcdn.net/localimg/localimages/07/mapjsapi/2x/bt_close.gif"
-                style={{
-                    position: "absolute",
-                    right: "5px",
-                    top: "5px",
-                    cursor: "pointer",
-
-                }}
-                onClick={() => setIsOpen(!isOpen)}
-            />
-            <div style={{ padding: "5px", color: "#000", textAlign: "center" }}>내 위치</div>
-        </div>)}
-        </MapMarker>
-
-          <ShelterMarkers center={curPos} zoomLv={zoomLv} scale={50} />
-          
-          {switchCalcDist && path.length > 1 ?
+          />
+          <ShelterMarkers center={curPos} zoomLvl={zoomLvl} scale={50} />
+          {switchCalcDist && path.length >= 1 ?
             <Polyline
-              path={path}
+              path={[...path, pathMovingPt]}
               strokeWeight={1} // 선의 두께입니다
               strokeColor={"#FF0080"} // 선의 색깔입니다
               strokeOpacity={1} // 선의 불투명도입니다 0에서 1 사이값이며 0에 가까울수록 투명합니다
