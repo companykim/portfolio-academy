@@ -26,33 +26,42 @@ export default function ShelterMap() {
         console.log(error);
     };
 
-
     // 선의 거리 계산하기
     // 마우스 클릭: 시작, 오른쪽 마우스 클릭: 종료
+    // 그릴까 말까
     const [isdrawing, setIsdrawing] = useState(false)
+    // 점 찍기
     const [clickLine, setClickLine] = useState()
+    // 경로 그리기
     const [paths, setPaths] = useState([])
+    // 거리 계산
     const [distances, setDistances] = useState([])
+    // 마우스 상 위도 경도
     const [mousePosition, setMousePosition] = useState({
         lat: 0,
         lng: 0,
     })
+    // 점 찍고 다음 점 까지의 커서 움직임
     const [moveLine, setMoveLine] = useState()
-
 
     // 거리재기 토글
     const [calcDist, setCalcDist] = useState(false)
 
+    // 버튼을 누르면 거리재기가 실행됨
     const distToggle = (e) => {
         e.preventDefault();
         setCalcDist(!calcDist)
+        // 버튼을 누르면 초기화됨
+        setPaths([])
     }
-
 
     const handleClick = (
         _map,
         mouseEvent
     ) => {
+        if (!calcDist) {
+            return
+        }
         if (!isdrawing) {
             setDistances([])
             setPaths([])
@@ -75,6 +84,9 @@ export default function ShelterMap() {
         _map,
         mouseEvent
     ) => {
+        if (!calcDist) {
+            return
+        }
         setMousePosition({
             lat: mouseEvent.latLng.getLat(),
             lng: mouseEvent.latLng.getLng(),
@@ -86,13 +98,15 @@ export default function ShelterMap() {
         _map,
         _mouseEvent
     ) => {
+        if (!calcDist) {
+            return
+        }
         setIsdrawing(false)
     }
 
 
     const DistanceInfo = ({ distance }) => {
         const walkkTime = (distance / 67) | 0
-        const bycicleTime = (distance / 227) | 0
 
         return (
             <ul className="dotOverlay distanceInfo">
@@ -108,16 +122,6 @@ export default function ShelterMap() {
                         </>
                     )}
                     <span className="number">{walkkTime % 60}</span> 분
-                </li>
-                <li>
-                    <span className="label">자전거</span>{" "}
-                    {bycicleTime > 60 && (
-                        <>
-                            <span className="number">{Math.floor(bycicleTime / 60)}</span>{" "}
-                            시간{" "}
-                        </>
-                    )}
-                    <span className="number">{bycicleTime % 60}</span> 분
                 </li>
             </ul>
         )
@@ -163,20 +167,6 @@ export default function ShelterMap() {
                         onMouseOut={() => setIsOpen(false)}
                     >
                         {isOpen && (<div style={{ minWidth: "150px" }}>
-                            <img
-                                alt="close"
-                                width="14"
-                                height="13"
-                                src="https://t1.daumcdn.net/localimg/localimages/07/mapjsapi/2x/bt_close.gif"
-                                style={{
-                                    position: "absolute",
-                                    right: "5px",
-                                    top: "5px",
-                                    cursor: "pointer",
-
-                                }}
-                                onClick={() => setIsOpen(!isOpen)}
-                            />
                             <div style={{ padding: "5px", color: "#000", textAlign: "center" }}>내 위치</div>
                         </div>)}
                     </MapMarker>
