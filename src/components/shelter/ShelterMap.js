@@ -28,46 +28,36 @@ export default function ShelterMap() {
 
     // 선의 거리 계산하기
     // 마우스 클릭: 시작, 오른쪽 마우스 클릭: 종료
-    // 그릴까 말까
-    const [isdrawing, setIsdrawing] = useState(false)
-    // 점 찍기
-    const [clickLine, setClickLine] = useState()
-    // 경로 그리기
-    const [paths, setPaths] = useState([])
-    // 거리 계산
-    const [distances, setDistances] = useState([])
-    // 마우스 상 위도 경도
-    const [mousePosition, setMousePosition] = useState({
+    const [isdrawing, setIsdrawing] = useState(false) // 선 그릴거야
+    const [clickDot, setClickDot] = useState() // 점 찍기
+    const [path, setPath] = useState([]) // 경로 그리기
+    const [distances, setDistances] = useState([]) // 거리 계산
+    const [mousePosition, setMousePosition] = useState({ 
         lat: 0,
         lng: 0,
-    })
-    // 점 찍고 다음 점 까지의 커서 움직임
-    const [moveLine, setMoveLine] = useState()
+    }) // 마우스 상 위도 경도
+    const [moveLine, setMoveLine] = useState() // 점 찍고 다음 점 까지의 커서 움직임
 
-
-    // 거리재기 토글
-    const [calcDist, setCalcDist] = useState(false)
+    const [startDist, setStartDist] = useState(false) // 거리재기 토글
 
     // 버튼을 누르면 거리재기가 실행됨
     const distToggle = (e) => {
         e.preventDefault();
-        setCalcDist(!calcDist)
-        // 버튼을 누르면 초기화됨
-        setPaths([])
+        setStartDist(!startDist)
+        setPath([])
     }
 
-    const handleClick = (
-        _map,
-        mouseEvent
-    ) => {
-        if (!calcDist) {
+    const handleClick = (_map, mouseEvent) => {
+        if (!startDist) {
+            // 거리재기 버튼이 활성화된 상태가 아니라면 무시
             return
-        }
+        } 
         if (!isdrawing) {
+            // 그리는 중이 아니면 거리재기도 경로 그리기도 0
             setDistances([])
-            setPaths([])
+            setPath([])
         }
-        setPaths((prev) => [
+        setPath((prev) => [
             ...prev,
             {
                 lat: mouseEvent.latLng.getLat(),
@@ -76,16 +66,13 @@ export default function ShelterMap() {
         ])
         setDistances((prev) => [
             ...prev,
-            Math.round(clickLine.getLength() + moveLine.getLength()),
+            Math.round(clickDot.getLength() + moveLine.getLength()), // 점에서 그린 선까지의 거리 계산
         ])
         setIsdrawing(true)
     }
 
-    const handleMouseMove = (
-        _map,
-        mouseEvent
-    ) => {
-        if (!calcDist) {
+    const handleMouseMove = (_map, mouseEvent) => {
+        if (!startDist) { 
             return
         }
         setMousePosition({
@@ -95,16 +82,12 @@ export default function ShelterMap() {
     }
 
     // 마우스 오른쪽 클릭 -> 종료
-    const handleRightClick = (
-        _map,
-        mouseEvent
-    ) => {
-        if (!calcDist) {
+    const handleRightClick = (_map, mouseEvent) => {
+        if (!startDist) {
             return
         }
         setIsdrawing(false)
     }
-
 
     const DistanceInfo = ({ distance }) => {
         const walkkTime = (distance / 67) | 0
@@ -175,17 +158,17 @@ export default function ShelterMap() {
                     <ShelterMarkers center={curPos} zoomLv={zoomLv} scale={50} />
 
                     {/* // 선의 거리 계산하기 */}
-                    {calcDist && <> 
+                    {startDist && <> 
                     <CalculatePolylineDistanceStyle />
                     <Polyline
-                        path={paths}
+                        path={path}
                         strokeWeight={3} // 선의 두께입니다
                         strokeColor={"#db4040"} // 선의 색깔입니다
                         strokeOpacity={1} // 선의 불투명도입니다 0에서 1 사이값이며 0에 가까울수록 투명합니다
                         strokeStyle={"solid"} // 선의 스타일입니다
-                        onCreate={setClickLine}
+                        onCreate={setClickDot}
                     />
-                    {paths.map((path) => (
+                    {path.map((path) => (
                         <CustomOverlayMap
                             key={`dot-${path.lat},${path.lng}`}
                             position={path}
@@ -194,11 +177,11 @@ export default function ShelterMap() {
                             <span className="dot"></span>
                         </CustomOverlayMap>
                     ))}
-                    {paths.length > 1 &&
+                    {path.length > 1 &&
                         distances.slice(1, distances.length).map((distance, index) => (
                             <CustomOverlayMap
-                                key={`distance-${paths[index + 1].lat},${paths[index + 1].lng}`}
-                                position={paths[index + 1]}
+                                key={`distance-${path[index + 1].lat},${path[index + 1].lng}`}
+                                position={path[index + 1]}
                                 yAnchor={1}
                                 zIndex={2}
                             >
@@ -212,7 +195,7 @@ export default function ShelterMap() {
                             </CustomOverlayMap>
                         ))}
                     <Polyline
-                        path={isdrawing ? [paths[paths.length - 1], mousePosition] : []}
+                        path={isdrawing ? [path[path.length - 1], mousePosition] : []}
                         strokeWeight={3} // 선의 두께입니다
                         strokeColor={"#db4040"} // 선의 색깔입니다
                         strokeOpacity={0.5} // 선의 불투명도입니다 0에서 1 사이값이며 0에 가까울수록 투명합니다
@@ -224,7 +207,7 @@ export default function ShelterMap() {
                             <div className="dotOverlay distanceInfo">
                                 총거리{" "}
                                 <span className="number">
-                                    {Math.round(clickLine.getLength() + moveLine.getLength())}
+                                    {Math.round(clickDot.getLength() + moveLine.getLength())}
                                 </span>
                                 m
                             </div>
