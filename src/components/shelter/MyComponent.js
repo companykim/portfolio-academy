@@ -1,18 +1,27 @@
-import React, { useState, useEffect } from 'react'
+import React, { memo, useState, useEffect } from 'react'
 import { GoogleMap, MarkerF, InfoWindow } from '@react-google-maps/api';
 import ShelterMarkers_google from './ShelterMarkers_google';
+import Directions from './Directions';
 
 const containerStyle = {
   width: '100%',
   height: '600px'
 };
 
-export default function MyComponent() {
+const myStyles = [
+  {
+    featureType: "poi",
+    elementType: "labels",
+    stylers: [{ visibility: "off" }],
+  },
+];
+
+const MyComponent = () => {
   const [curPos, setCurPos] = useState(null);
   const [zoomLv, setZoomLv] = useState(10);
 
   const [activeMarker, setActiveMarker] = useState(null);
-    
+
   const handleActiveMarker = (marker) => {
       if (marker === activeMarker) {
           return;
@@ -43,10 +52,10 @@ const geoLocError = (err) => {
           lng: curPos.longitude
         }}
         zoom={zoomLv}
-        options={{disableDefaultUI: true}}
+        options={{disableDefaultUI: true, styles: myStyles }}
       >
           <MarkerF 
-            position={{
+            position={ {
               lat: curPos.latitude,
               lng: curPos.longitude
             }} 
@@ -55,25 +64,27 @@ const geoLocError = (err) => {
           >
             {activeMarker !== null &&
               <InfoWindow onCloseClick={() => setActiveMarker(null)}
-                position={{
+                position={{ 
                   lat: curPos.latitude,
                   lng: curPos.longitude
                 }}
                 xAnchor={0.3}
                 yAnchor={0.5}
               >
+                <div align="Center">
+                  내 위치 <br/>
+                </div>
 
-              <div align="Center">
-                내 위치
-              </div>
-
-          </InfoWindow>
+              </InfoWindow>
             }
           </MarkerF>
 
+            
         <ShelterMarkers_google center={curPos} zoomLv={zoomLv} scale={50} /> 
       </GoogleMap>
     }
     </>
   )
 }
+
+export default memo(MyComponent)

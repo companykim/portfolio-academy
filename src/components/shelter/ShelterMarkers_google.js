@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { GoogleMap, MarkerF, InfoWindow, DirectionsService, DirectionsRenderer } from '@react-google-maps/api';
 import { Fetch } from 'toolbox/Fetch';
 
+// 파라미터: 함수에서 정의되어 사용되는 변수
 export default function ShelterMarkers_google({ center, zoomLv, scale }) {
     const displayLv = zoomLv * parseInt(100 / 14)
     const halfBoundary = scale * 100000
