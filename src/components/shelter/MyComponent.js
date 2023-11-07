@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { GoogleMap, MarkerF, InfoWindowF } from '@react-google-maps/api';
+import { GoogleMap, MarkerF, InfoWindow } from '@react-google-maps/api';
 import ShelterMarkers_google from './ShelterMarkers_google';
 
 const containerStyle = {
@@ -10,7 +10,15 @@ const containerStyle = {
 export default function MyComponent() {
   const [curPos, setCurPos] = useState(null);
   const [zoomLv, setZoomLv] = useState(10);
-  const [isOpen, setIsOpen] = useState(false);
+
+  const [activeMarker, setActiveMarker] = useState(null);
+    
+  const handleActiveMarker = (marker) => {
+      if (marker === activeMarker) {
+          return;
+      }
+      setActiveMarker(marker);
+  };
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(geolocSuccessHandler, geoLocError); // 성공시 successHandler, 실패시 errorHandler 함수가 실행된다.
@@ -43,14 +51,24 @@ const geoLocError = (err) => {
               lng: curPos.longitude
             }} 
             icon={"https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png"}
-            clickable={true}
-            removable={true}
-            onMouseOver={() => setIsOpen(true)}
-            onMouseOut={() => setIsOpen(false)}
+            onClick={() => handleActiveMarker(0)}
           >
-          {isOpen && (<div style={{ minWidth: "150px" }}>
-            <div style={{ padding: "5px", color: "#000", textAlign: "center" }}>내 위치</div>
-          </div>)}
+            {activeMarker !== null &&
+              <InfoWindow onCloseClick={() => setActiveMarker(null)}
+                position={{
+                  lat: curPos.latitude,
+                  lng: curPos.longitude
+                }}
+                xAnchor={0.3}
+                yAnchor={0.5}
+              >
+
+              <div align="Center">
+                내 위치
+              </div>
+
+          </InfoWindow>
+            }
           </MarkerF>
 
         <ShelterMarkers_google center={curPos} zoomLv={zoomLv} scale={50} /> 

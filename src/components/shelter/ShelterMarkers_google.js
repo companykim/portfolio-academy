@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { GoogleMap, MarkerF, InfoWindow } from '@react-google-maps/api';
+import { GoogleMap, MarkerF, InfoWindow, DirectionsService, DirectionsRenderer } from '@react-google-maps/api';
 import { Fetch } from 'toolbox/Fetch';
 
 export default function ShelterMarkers_google({ center, zoomLv, scale }) {
@@ -9,13 +9,6 @@ export default function ShelterMarkers_google({ center, zoomLv, scale }) {
 
     const [activeMarker, setActiveMarker] = useState(null);
     
-    const [positions, setPositions] = useState([]);
-
-    useEffect(() => {
-        setPositions(clusterPositionsData.positions);
-      },[])
-    
-
     const handleActiveMarker = (marker) => {
         if (marker === activeMarker) {
             return;
@@ -50,7 +43,15 @@ export default function ShelterMarkers_google({ center, zoomLv, scale }) {
                 >
                     <div align="Center">
                         {activeMarker.name} <br/>
-                        {activeMarker.addr}
+                        {activeMarker.addr} < br/>
+                        <a
+                            href={`https://map.kakao.com/link/to/${activeMarker.name},${activeMarker.shelterId.lat},${activeMarker.shelterId.lng}`}
+                            style={{ color: "blue" }}
+                            target="_blank"
+                            rel="noreferrer"
+          >
+            길찾기
+          </a>
                     </div>
                 </InfoWindow>
             }
