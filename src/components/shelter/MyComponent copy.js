@@ -1,12 +1,19 @@
 import React, { useState, useEffect } from 'react'
-import { GoogleMap, MarkerF, InfoWindowF } from '@react-google-maps/api';
+import { GoogleMap, MarkerF } from '@react-google-maps/api';
 import ShelterMarkers_google from './ShelterMarkers_google';
-import CustomOverlay2Style from 'style/CustomOverlay2Style';
 
 const containerStyle = {
   width: '100%',
   height: '600px'
 };
+
+const myStyles = [
+  {
+    featureType: "poi",
+    elementType: "labels",
+    stylers: [{ visibility: "off" }],
+  },
+];
 
 function MyComponent() {
   const [curPos, setCurPos] = useState(null);
@@ -30,22 +37,29 @@ const geoLocError = (err) => {
     <>
     {curPos &&
       <GoogleMap
-        mapContainerStyle={containerStyle}
         center={{
           lat: curPos.latitude,
           lng: curPos.longitude
         }}
+        mapContainerStyle={containerStyle}
         zoom={zoomLv}
-        options={{disableDefaultUI: true}}
+        options={{ disableDefaultUI: true, styles: myStyles }}
       >
           <MarkerF 
             position={{
               lat: curPos.latitude,
               lng: curPos.longitude
             }} 
-            icon={"https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png"}
+            image={{
+              src: "https://cdn-icons-gif.flaticon.com/12589/12589164.gif", // 마커이미지의 주소
+              size: {
+                  width: 50,
+                  height: 50,
+              } // 마커이미지의 크기입니다
+          }}
           />
-        <ShelterMarkers_google center={curPos} zoomLv={zoomLv} scale={50} />
+
+        <ShelterMarkers_google center={curPos} zoomLv={zoomLv} scale={50} /> 
       </GoogleMap>
     }
     </>
