@@ -45,13 +45,13 @@ export default function ShelterMarkers_google({ center, zoomLv, scale }) {
                         {activeMarker.name} <br/>
                         {activeMarker.addr} < br/>
                         <a
-                            href={`https://map.kakao.com/link/to/${activeMarker.name},${activeMarker.shelterId.lat},${activeMarker.shelterId.lng}`}
+                            href={`https://www.google.com/maps/dir/?api=1&destination=${activeMarker.shelterId.lat},${activeMarker.shelterId.lng}`}
                             style={{ color: "blue" }}
                             target="_blank"
                             rel="noreferrer"
-          >
-            길찾기
-          </a>
+                        >
+                            길찾기
+                        </a>
                     </div>
                 </InfoWindow>
             }
