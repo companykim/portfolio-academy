@@ -2,6 +2,7 @@ import React, { memo, useState, useEffect } from 'react'
 import { GoogleMap, MarkerF, InfoWindow } from '@react-google-maps/api';
 import ShelterMarkers_google from './ShelterMarkers_google';
 import Directions from './Directions';
+import { Button } from 'react-bootstrap';
 
 const containerStyle = {
   width: '100%',
@@ -16,11 +17,20 @@ const myStyles = [
   },
 ];
 
-const MyComponent = () => {
+const MyComponent = ({Shelters}) => {
   const [curPos, setCurPos] = useState(null);
   const [zoomLv, setZoomLv] = useState(10);
 
   const [activeMarker, setActiveMarker] = useState(null);
+
+  // 경로 탐색 toggle
+  const [switchCalcRoute, setSwitchCalcRoute] = useState(null);
+  
+  const calcRouteToggle = (e) => {
+    e.preventDefault();
+    // 경로 탐색
+    setSwitchCalcRoute(!switchCalcRoute);
+  }
 
   const handleActiveMarker = (marker) => {
       if (marker === activeMarker) {
@@ -78,11 +88,18 @@ const geoLocError = (err) => {
               </InfoWindow>
             }
           </MarkerF>
-
-            
         <ShelterMarkers_google center={curPos} zoomLv={zoomLv} scale={50} /> 
+
+        {/* 경로탐색 버튼을 누르면 */}
+        {switchCalcRoute !== null &&
+          // 만약 도착지점의 마커를 찍을 때에만 내 위치에서 도착지점까지의 경로를 탐색한다.
+          // 그러면 내가 할일은????
+          <Directions origin={{lat: curPos.latitude, lng: curPos.longitude}} destination={{lat:37.498460, lng: 126.942430}}/>
+        }
+        
       </GoogleMap>
     }
+    <Button onClick={calcRouteToggle}>경로탐색</Button>
     </>
   )
 }

@@ -24,7 +24,7 @@ const Directions = ({ origin, destination } ) => {
         console.log(result, status);
         if (status === 'OK' && count.current === 0) {
             count.current += 1;
-            setDirections(result);
+            setDirections(result); 
         }
     };
 
@@ -34,7 +34,6 @@ const Directions = ({ origin, destination } ) => {
                 options={{ origin, destination, travelMode: 'TRANSIT'}}
                 callback={directionsCallback}
             />
-            
             <DirectionsRenderer directions={directions} options={options} />
         </>
     );
