@@ -1,9 +1,12 @@
-import React, { memo, useState, useEffect } from 'react'
-import { GoogleMap, MarkerF, InfoWindow } from '@react-google-maps/api';
+import React, { useState, useEffect } from 'react'
+import { GoogleMap, MarkerF } from '@react-google-maps/api';
+import ViewDirections from './Directions';
 import ShelterMarkers_google from './ShelterMarkers_google';
-import Directions from './Directions';
-import { Button } from 'react-bootstrap';
+import { useRef } from 'react';
+import { render } from '@testing-library/react';
+import { MarkerClusterer } from '@react-google-maps/api';
 
+// 
 const containerStyle = {
   width: '100%',
   height: '600px'
@@ -17,103 +20,86 @@ const myStyles = [
   },
 ];
 
-const MyComponent = () => {
-  // 현재 위치
+function MyComponent() {
   const [curPos, setCurPos] = useState(null);
-  // 지도 확대 단계
   const [zoomLv, setZoomLv] = useState(10);
 
-  // Directions에서 콜백
-  const [gettingDest, setGettingDest] = useState();
-
-  // 마커 선택하기 위함
-  const [activeMarker, setActiveMarker] = useState(null);
-
-  const handleActiveMarker = (marker) => {
-      if (marker === activeMarker) {
-          return;
-      }
-      setActiveMarker(marker);
-  };
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(geolocSuccessHandler, geoLocError); // 성공시 successHandler, 실패시 errorHandler 함수가 실행된다.
-}, []);
+  }, []);
 
-const geolocSuccessHandler = (response) => {
+  const geolocSuccessHandler = (response) => {
     const { latitude, longitude } = response.coords;
-    setCurPos({latitude, longitude});
-};
+    setCurPos({ latitude, longitude });
+    console.log("위도: ", latitude);
+    console.log("경도: ", longitude);
+  };
 
-const geoLocError = (err) => {
+  const geoLocError = (err) => {
     console.log("geoLocError = ", err)
-}
+  }
 
+  // 도착 지점
+  const [destPoint, setDestPoint] = useState(null);
   // 토글 기능
   const [swichDirections, setSwichDirections] = useState(false);
 
   const toggleDirections = (e) => {
     e.preventDefault();
-    console.log("눌리긴 하니");
+    // console.log("눌리긴 하니");
     // 만약에 토글이 null이 아니면 활성화, null이면 청소하고 비활성화
     setSwichDirections(!swichDirections)
+    setDestPoint(null)
   }
-
 
   return (
     <>
-    {curPos &&
-      <GoogleMap
-        mapContainerStyle={containerStyle}
-        // 지도 위치를 현재 위치로 이동
-        center={{
-          lat: curPos.latitude,
-          lng: curPos.longitude
-        }}
-        // 지도 확대
-        zoom={zoomLv}
-        // 구글맵에서 제공하는 일부 기능 삭제
-        options={{disableDefaultUI: true, styles: myStyles }}
-      >
-          <MarkerF 
-          // 현재 위치를 마커로 표시함.
-            position={ {
-              lat: curPos.latitude,
-              lng: curPos.longitude
-            }} 
+      {curPos &&
+        <GoogleMap
+          mapContainerStyle={containerStyle}
+          center={{
+            lat: 37.4854799, 
+            lng: 126.8981862
+            // lat: curPos.latitude,
+            // lng: curPos.longitude
+          }}
+          zoom={zoomLv}
+          options={{disableDefaultUI: true, styles: myStyles }}
+        >
+          {/* // 내 위치 띄우는 마커 */}
+          <MarkerF
+            position={{
+              lat: 37.4854799,
+              lng: 126.8981862
+            }}
+            // icon={
+            //   {url:"https://cdn-icons-gif.flaticon.com/12589/12589164.gif"}
+            // }
+            // scale={1.5}
             icon={"https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png"}
-            onClick={() => handleActiveMarker(0)}
           >
-            {/* 마커를 입력했을 때 정보창을 띄움 */}
-            {activeMarker !== null &&
-              <InfoWindow onCloseClick={() => setActiveMarker(null)}
-                position={{ 
-                  lat: curPos.latitude,
-                  lng: curPos.longitude
-                }}
-              >
-                <div align="Center">
-                  내 위치 <br/>
-                </div>
-              </InfoWindow>
-            }
           </MarkerF>
-        <ShelterMarkers_google center={curPos} zoomLv={zoomLv} scale={50} gettingDest={gettingDest} setGettingDest={setGettingDest} />
 
-        {/* 경로탐색 버튼을 누르면 */}
-        {swichDirections &&
-          // 만약 도착지점의 마커를 찍을 때에만 내 위치에서 도착지점까지의 경로를 탐색한다.
-          <Directions 
-            origin={{lat: curPos.latitude, lng: curPos.longitude}} 
-            //destination={{lat: 37.485253, lng: 126.898051}}
-            destination={{setGettingDest}}
-          />
-        }
-      </GoogleMap>
-    }
-    <Button onClick={toggleDirections}>경로탐색</Button>
+          <MarkerClusterer>
+            {clusterer =>
+              <ShelterMarkers_google center={curPos} zoomLv={zoomLv} scale={50} clusterer={clusterer} setDestPoint={setDestPoint}/>
+            }
+          </MarkerClusterer>
+
+          {/* lat: curPos.latitude, lng: curPos.longitude */}
+          {swichDirections && destPoint ?
+            <ViewDirections origin={{ lat: 37.4854799, lng: 126.8981862 }} destination={destPoint} />
+            : <></>
+          }
+
+        </GoogleMap>
+      }
+
+      <button onClick={toggleDirections}>경로 탐색</button>
+
     </>
   )
 }
 
-export default memo(MyComponent)
+export default React.memo(MyComponent)

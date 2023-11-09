@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { GoogleMap, MarkerF, InfoWindow, DirectionsService, DirectionsRenderer } from '@react-google-maps/api';
 import { Fetch } from 'toolbox/Fetch';
+import { MarkerClusterer, SuperClusterAlgorithm } from '@googlemaps/markerclusterer';
 
 // 파라미터: 함수에서 정의되어 사용되는 변수
-export default function ShelterMarkers_google({ center, zoomLv, scale, gettingDest, setGettingDest }) {
+export default function ShelterMarkers_google({ center, zoomLv, scale, clusterer, setDestPoint }) {
     const displayLv = zoomLv * parseInt(100 / 14)
     const halfBoundary = scale * 100000
     const shelterUri = `http://localhost:8080/shelter/지진-옥외/${center.latitude}/${center.longitude}/${displayLv}/${halfBoundary}`;
 
     const [activeMarker, setActiveMarker] = useState(null);
-    const [선택한마커, set선택한마커] = useState(null);
+
+    const [activeShelter, setActiveShelter] = useState(null);
 
     const handleActiveMarker = (marker) => {
         if (marker === activeMarker) {
@@ -17,14 +19,17 @@ export default function ShelterMarkers_google({ center, zoomLv, scale, gettingDe
         }
         setActiveMarker(marker);
     };
-
-    const selectMarker = (select) => {
-        if (select === 선택한마커) {
-            return;
-        }
-        set선택한마커(select);
-        setGettingDest([...gettingDest, ...select]);
-    }
+    
+    // 내가 찍은 마커를 도착 지점으로 지정
+    const handleActiveShelter = (chosenShelter) => {
+        setDestPoint({ lat: chosenShelter.shelterId.lat, lng: chosenShelter.shelterId.lng });
+    };
+    
+    // 마커 클러스터링
+    new MarkerClusterer({
+        algorithm: new SuperClusterAlgorithm({ radius: 100 })
+    })
+    
 
     function RenderSuccess(shelterList) {
         return (
@@ -32,7 +37,7 @@ export default function ShelterMarkers_google({ center, zoomLv, scale, gettingDe
             {shelterList?.map((shelter) => (
                 <>
                     <MarkerF 
-                        onClick={() => selectMarker(shelter)}
+                         onClick={() => handleActiveShelter(shelter)}
                         position={shelter.shelterId}
                         onRightClick={() => handleActiveMarker(shelter)}
                         image={{
@@ -42,6 +47,8 @@ export default function ShelterMarkers_google({ center, zoomLv, scale, gettingDe
                                 height: 40,
                             } // 마커이미지의 크기입니다
                         }}
+                        clusterer={clusterer}
+
                     />
                 </>
             ))}
