@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import { GoogleMap, MarkerF, MarkerClusterer, MarkerClustererF } from '@react-google-maps/api';
 import ViewDirections from './Directions';
 import ShelterMarkers_google from './ShelterMarkers_google';
-import "./styles.css";
+import AutoComplete from './AutoComplete';
 
 const containerStyle = {
   width: '100%',
@@ -20,37 +20,6 @@ const myStyles = [
 function MyComponent() {
   const [curPos, setCurPos] = useState(null);
   const [zoomLv, setZoomLv] = useState(10);
-  //장소 검색 
-  const inputRef = useRef()
-  const inputStyle= {
-    boxShadow: 'inset 0 0 10px #eee !important',
-    border: '2px solid #eee',
-    width: '456px',
-    height: '40px',
-    marginLeft: '16px',
-    borderRadius: '20px',
-    fontWeight: '300 !important',
-    outline: 'none',
-    padding: '10px 20px',
-    marginBottom: '10px',
-  }
-
-  const autoComplete = new window.google.maps.places.Autocomplete(
-    inputRef.current,
-  )
-
-  autoComplete.addListener('place_changed', () => {
-    const place = autoComplete.getPlace()
-    if (!place.geometry || !place.geometry.location) {
-      // User entered the name of a Place that was not suggested and
-      // pressed the Enter key, or the Place Details request failed.
-        alert("this location not available")
-    }
-    if (place.geometry.viewport || place.geometry.location) {
-        // do something
-        console.log(place.geometry.location)
-    }
-  })
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(geolocSuccessHandler, geoLocError); // 성공시 successHandler, 실패시 errorHandler 함수가 실행된다.
@@ -69,6 +38,8 @@ function MyComponent() {
   const [destPoint, setDestPoint] = useState(null);
   // 토글 기능
   const [swichDirections, setSwichDirections] = useState(false);
+
+  const [placelating, setPlacelating] = useState({});
 
   const toggleDirections = (e) => {
     e.preventDefault();
@@ -101,13 +72,24 @@ function MyComponent() {
           >
           </MarkerF>
 
+          {placelating &&
+            //console.log(placelating)
+            <MarkerF
+              position={{
+                lat: placelating.lat,
+                lng: placelating.lng
+              }}
+              icon={"https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png"}
+            >
+            </MarkerF>
+          }
+
           <MarkerClusterer>
             {clusterer =>
-              <ShelterMarkers_google center={curPos} zoomLv={zoomLv} scale={50} clusterer={clusterer} setDestPoint={setDestPoint}/>
+              <ShelterMarkers_google center={curPos} zoomLv={zoomLv} scale={50} clusterer={clusterer} setDestPoint={setDestPoint} />
+
             }
           </MarkerClusterer>
-
-
 
           {/* lat: curPos.latitude, lng: curPos.longitude */}
           {swichDirections && destPoint ?
@@ -117,18 +99,7 @@ function MyComponent() {
         </GoogleMap>
       }
       <button onClick={toggleDirections}>경로 탐색</button>
-      {/* 장소 검색 */}
-      <div className="inputStyle">
-      <label >Location</label>
-        <input
-          placeholder='장소를 입력하세요'
-          ref={inputRef}
-          style={inputStyle}
-        />
-        <MarkerF
-
-        />
-      </div>
+      <AutoComplete setPlacelating={setPlacelating}/>
     </>
   )
 }
