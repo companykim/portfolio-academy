@@ -1,0 +1,12 @@
+.inputStyle {
+    box-Shadow: 'inset 0 0 10px #eee !important';
+    border: '2px solid #eee';
+    width: '456px';
+    height: '40px';
+    margin-Left: '16px';
+    border-Radius: '20px';
+    font-Weight: '300 !important';
+    outline: 'none';
+    padding: '10px 20px';
+    margin-Bottom: '10px';
+}
