@@ -1,14 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { GoogleMap, MarkerF, MarkerClusterer, MarkerClustererF } from '@react-google-maps/api';
+import { GoogleMap, MarkerF, MarkerClusterer, MarkerClustererF, InfoWindow } from '@react-google-maps/api';
 import ViewDirections from './Directions';
 import ShelterMarkers_google from './ShelterMarkers_google';
-import AutoComplete from './AutoComplete';
+import AutoComplete from './ExploringDirection';
+import { Button } from 'react-bootstrap';
 
+// 지도 크기
 const containerStyle = {
   width: '100%',
   height: '600px'
 };
 
+// googlemap api에서 기본 제공하는 기능들 삭제
 const myStyles = [
   {
     featureType: "poi",
@@ -17,7 +20,7 @@ const myStyles = [
   },
 ];
 
-function MyComponent() {
+export default function ShelterMap_Google() {
   const [curPos, setCurPos] = useState(null);
   const [zoomLv, setZoomLv] = useState(10);
 
@@ -34,12 +37,19 @@ function MyComponent() {
     console.log("geoLocError = ", err)
   }
 
+  // 마커 선택하기 위함
+  const [activeMarker, setActiveMarker] = useState(null);
+
   // 도착 지점
   const [destPoint, setDestPoint] = useState(null);
   // 토글 기능
   const [swichDirections, setSwichDirections] = useState(false);
 
   const [placelating, setPlacelating] = useState({});
+
+  const handleActiveMarker = (marker) => {
+    setActiveMarker(marker);
+};
 
   const toggleDirections = (e) => {
     e.preventDefault();
@@ -69,7 +79,20 @@ function MyComponent() {
               lng: 126.8981862
             }}
             icon={"https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png"}
+            onClick={() => handleActiveMarker(0)}
           >
+          {activeMarker !== null &&
+              <InfoWindow onCloseClick={() => setActiveMarker(null)}
+                position={{ 
+                  lat: 37.4854799, 
+                  lng: 126.8981862
+                }}
+              >
+                <div align="Center">
+                  내 위치 <br/>
+                </div>
+              </InfoWindow>
+            }  
           </MarkerF>
 
           {placelating &&
@@ -98,10 +121,8 @@ function MyComponent() {
           }
         </GoogleMap>
       }
-      <button onClick={toggleDirections}>경로 탐색</button>
+      <Button onClick={toggleDirections}>경로 탐색</Button>
       <AutoComplete setPlacelating={setPlacelating}/>
     </>
   )
 }
-
-export default React.memo(MyComponent)

@@ -12,7 +12,6 @@ export default function BBSNav() {
               <Nav.Link href="/shelter">대피소 안내</Nav.Link>
               <Nav.Link href="/manual">대피요령</Nav.Link>
               <Nav.Link href="/makers">만든이</Nav.Link>
-              <Nav.Link href="/example">예제</Nav.Link>
             </Nav>
           </Container>
         </Navbar>

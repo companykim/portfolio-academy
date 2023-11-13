@@ -1,9 +1,10 @@
 import { useRef, useState } from 'react'
 import { MarkerF } from '@react-google-maps/api';
 
-function AutoComplete({setPlacelating}) {
+export default function ExploringDirection({setPlacelating}) {
   const inputRef = useRef()
 
+  // 정보 검색창 css
   const inputStyle= {
     boxShadow: 'inset 0 0 10px #eee !important',
     border: '2px solid #eee',
@@ -54,5 +55,3 @@ function AutoComplete({setPlacelating}) {
       </div>
     );
 }
-
-export default AutoComplete;
