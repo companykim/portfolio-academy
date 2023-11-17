@@ -3,5 +3,6 @@
        "baseUrl": "src"
     },
     "include": [
-       "src", "toolbox"    ]
+       "src"
+, "toolbox"    ]
  }

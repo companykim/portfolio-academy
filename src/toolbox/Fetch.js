@@ -25,5 +25,4 @@ function AxiosPost({uri, body, renderSuccess = f=>f,
         return renderSuccess(body, data);
     }
 }
-
 export {Fetch, AxiosPost};

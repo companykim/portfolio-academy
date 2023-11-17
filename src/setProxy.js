@@ -7,4 +7,11 @@ module.exports = function (app) {
       changeOrigin: true,
     })
   );
+
+  app.use(
+    createProxyMiddleware("/googleapi", {
+      target: "https://maps.googleapis.com",
+      changeOrigin: true,
+    })
+  );
 };

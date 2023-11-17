@@ -1,7 +1,7 @@
+import React from "react";
 import './App.css';
-
 import BBSRouter from 'router/BBSRouter';
-import {useContext, useState} from 'react';
+import { useContext, useState } from 'react';
 import AppContext from 'context/AppContextProvider';
 import axios from 'api/axios';
 
@@ -15,7 +15,7 @@ function App() {
   if (!codeList) {
     getCodeList(setCodeList);
   }
-  return <BBSRouter/>
+  return <BBSRouter />
 }
 
 export default App;

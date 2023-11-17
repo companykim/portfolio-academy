@@ -1,62 +1,76 @@
 import React, { useState, useEffect } from 'react';
-import { Map, MapMarker, CustomOverlayMap } from "react-kakao-maps-sdk"
-import CustomOverlay2Style from 'style/CustomOverlay2Style';
+import { Map, Polyline, MapMarker, CustomOverlayMap } from "react-kakao-maps-sdk"
+import CustomOverlayStyle from 'style/CustomOverlayStyle';
 import ShelterMarkers from './ShelterMarkers';
-import { Polyline } from 'react-kakao-maps-sdk';
 import CalculatePolylineDistanceStyle from 'style/CalculatePolylineDistanceStyle';
-
+/**
+ * 
+ */
 export default function ShelterMap() {
-    const { kakao } = window;
     const [curPos, setCurPos] = useState(null); // 현재 위치를 저장할 상태
-    const [zoomLv, setZoomLv] = useState(3);   // 지도의 확대 레벨. 1: 코앞에(20m), 30m,50m,100m,250m,500m,1km,2km,4km,8km,16km,32km,64km 10: 멀리(도) 14: 최대(128km)
-    const [isOpen, setIsOpen] = useState(false);
+    const [zoomLv, setZoomLv] = useState(3);  //1:코앞에 20M, 2:30M, 50M, 100M, 250M, 500M, 1KM, 2KM, 4KM, 8KM, 16KM, 32KM, 13:64KM, 14 128KM 동북아
+    const [isMarkerOpen, setIsMarkerOpen] = useState(false);
 
-    // 현재 위치 가져오기, [] 생성 시에 자동실행
+    // 현재 위치를 ShelterMap을 생성할 때 준비해 줍니다.
     useEffect(() => {
         navigator.geolocation.getCurrentPosition(geolocSuccessHandler, geolocErrorHandler); // 성공시 successHandler, 실패시 errorHandler 함수가 실행된다.
     }, []);
 
     const geolocSuccessHandler = (response) => {
-        console.log(response); // coords: GeolocationCoordinates {latitude: 위도, longitude: 경도, …} timestamp: 1673446873903
         const { latitude, longitude } = response.coords;
         setCurPos({ latitude, longitude });
     };
 
-    const geolocErrorHandler = (error) => {
-        console.log(error);
-    };
+    const geolocErrorHandler = (err) => {
+        console.log("geoLocError = ", err)
+    }
 
-    // 선의 거리 계산하기
-    // 마우스 클릭: 시작, 오른쪽 마우스 클릭: 종료
-    const [isdrawing, setIsdrawing] = useState(false) // 선 그릴거야
-    const [clickDot, setClickDot] = useState() // 점 찍기
-    const [path, setPath] = useState([]) // 경로 그리기
-    const [distances, setDistances] = useState([]) // 거리 계산
-    const [mousePosition, setMousePosition] = useState({ 
-        lat: 0,
-        lng: 0,
-    }) // 마우스 상 위도 경도
-    const [moveLine, setMoveLine] = useState() // 점 찍고 다음 점 까지의 커서 움직임
+    // 거리재기 토글
+    const [switchCalcDist, setSwitchCalcDist] = useState(0) // isLineDrawing
+    const [path, setPath] = useState([])
+    const [pathMovingPt, setPathMovingPt] = useState(0)
+    // 선의 거리
+    const [lineDistances, setLineDistances] = useState([])
 
-    const [startDist, setStartDist] = useState(false) // 거리재기 토글
+    const [distanceStartPoint, setDistanceStartPoint] = useState()
 
-    // 버튼을 누르면 거리재기가 실행됨
-    const distToggle = (e) => {
+    // 새로 찍은 점
+    const [distPolyMovingPoint, setDistPolyMovingPoint] = useState()
+
+    const calcDistToggle = (e) => {
         e.preventDefault();
-        setStartDist(!startDist)
+        setSwitchCalcDist(0)
+        //기존 거리 측정 경로 청소
         setPath([])
     }
 
-    const handleClick = (_map, mouseEvent) => {
-        if (!startDist) {
-            // 거리재기 버튼이 활성화된 상태가 아니라면 무시
+    // 커서 이동에 따라 길 그리기
+    const handleMove4Path = (
+        _map,
+        mouseEvent
+    ) => {
+        if (switchCalcDist !== 1|| path.length === 0) {
+            //경로 그리기 및 시작된 상태가 아니라면 무시
             return
-        } 
-        if (!isdrawing) {
-            // 그리는 중이 아니면 거리재기도 경로 그리기도 0
-            setDistances([])
-            setPath([])
         }
+        //경로에 추가
+        setPathMovingPt({
+            lat: mouseEvent.latLng.getLat(),
+            lng: mouseEvent.latLng.getLng(),
+        })
+        setLineDistances((prev) => [
+            ...prev,
+            Math.round(distanceStartPoint.getLength() + distPolyMovingPoint.getLength()),
+        ])
+    }
+
+    // switchCalcDist로 설정되어 있으면 클릭한 위치를 바탕으로 경로 추가
+    const addPath = (_map, mouseEvent) => {
+        if (switchCalcDist !== 1) {
+            return
+        }
+        console.log("경로에 모인 지점은...", path)
+        //경로에 추가
         setPath((prev) => [
             ...prev,
             {
@@ -64,33 +78,20 @@ export default function ShelterMap() {
                 lng: mouseEvent.latLng.getLng(),
             },
         ])
-        setDistances((prev) => [
-            ...prev,
-            Math.round(clickDot.getLength() + moveLine.getLength()), // 점에서 그린 선까지의 거리 계산
-        ])
-        setIsdrawing(true)
     }
 
-    const handleMouseMove = (_map, mouseEvent) => {
-        if (!startDist) { 
-            return
-        }
-        setMousePosition({
-            lat: mouseEvent.latLng.getLat(),
-            lng: mouseEvent.latLng.getLng(),
-        })
+    // 지정한 Point들로 거리측정하여 표기
+    const calcDistanceOnPolyline = (
+        _map,
+        _mouseEvent
+    ) => {
+        setSwitchCalcDist(2)
     }
 
-    // 마우스 오른쪽 클릭 -> 종료
-    const handleRightClick = (_map, mouseEvent) => {
-        if (!startDist) {
-            return
-        }
-        setIsdrawing(false)
-    }
-
-    const DistanceInfo = ({ distance }) => {
+    // 완료된 거리재기에 대한 정보
+    const PolyLineDistanceInfo = ({ distance }) => {
         const walkkTime = (distance / 67) | 0
+        const bicycleTime = (distance / 227) | 0
 
         return (
             <ul className="dotOverlay distanceInfo">
@@ -107,14 +108,24 @@ export default function ShelterMap() {
                     )}
                     <span className="number">{walkkTime % 60}</span> 분
                 </li>
+                <li>
+                    <span className="label">자전거</span>{" "}
+                    {bicycleTime > 60 && (
+                        <>
+                            <span className="number">{Math.floor(bicycleTime / 60)}</span>{" "}
+                            시간{" "}
+                        </>
+                    )}
+                    <span className="number">{bicycleTime % 60}</span> 분
+                </li>
             </ul>
         )
     }
 
     return (
         <>
-            <CustomOverlay2Style />
-            {curPos && <>
+            <CustomOverlayStyle />
+            {curPos &&
                 <Map // 지도를 표시할 Container
                     center={{
                         // 지도의 중심좌표
@@ -124,13 +135,12 @@ export default function ShelterMap() {
                     style={{
                         // 지도의 크기
                         width: "100%",
-                        height: "600px",
+                        height: "450px",
                     }}
-                    level={zoomLv} // 지도의 확대 레벨
-
-                    onClick={handleClick}
-                    onRightClick={handleRightClick}
-                    onMouseMove={handleMouseMove}
+                    level={zoomLv}  //  지도의 확대 레벨
+                    onClick={addPath || setIsMarkerOpen(false)}
+                    onMouseMove={handleMove4Path}
+                    onRightClick={calcDistanceOnPolyline}
                 >
                     {/* 내위치 표시 */}
                     <MapMarker
@@ -147,77 +157,45 @@ export default function ShelterMap() {
                         }}
                         clickable={true}
                         removable={true}
-                        onMouseOver={() => setIsOpen(true)}
-                        onMouseOut={() => setIsOpen(false)}
+                        onClick={() => setIsMarkerOpen(!isMarkerOpen)}
+                        onMouseOver={() => setIsMarkerOpen(true)}
+                        onMouseOut={() => setIsMarkerOpen(false)}
                     >
-                        {isOpen && (<div style={{ minWidth: "150px" }}>
+                        {isMarkerOpen && (<div style={{ minWidth: "150px" }}>
                             <div style={{ padding: "5px", color: "#000", textAlign: "center" }}>내 위치</div>
                         </div>)}
                     </MapMarker>
 
+                    {/* 대피소 마커 찍기 */}
                     <ShelterMarkers center={curPos} zoomLv={zoomLv} scale={50} />
 
                     {/* // 선의 거리 계산하기 */}
-                    {startDist && <> 
-                    <CalculatePolylineDistanceStyle />
-                    <Polyline
-                        path={path}
-                        strokeWeight={3} // 선의 두께입니다
-                        strokeColor={"#db4040"} // 선의 색깔입니다
-                        strokeOpacity={1} // 선의 불투명도입니다 0에서 1 사이값이며 0에 가까울수록 투명합니다
-                        strokeStyle={"solid"} // 선의 스타일입니다
-                        onCreate={setClickDot}
-                    />
-                    {path.map((path) => (
-                        <CustomOverlayMap
-                            key={`dot-${path.lat},${path.lng}`}
-                            position={path}
-                            zIndex={1}
-                        >
-                            <span className="dot"></span>
-                        </CustomOverlayMap>
-                    ))}
-                    {path.length > 1 &&
-                        distances.slice(1, distances.length).map((distance, index) => (
-                            <CustomOverlayMap
-                                key={`distance-${path[index + 1].lat},${path[index + 1].lng}`}
-                                position={path[index + 1]}
-                                yAnchor={1}
-                                zIndex={2}
-                            >
-                                {!isdrawing && distances.length === index + 2 ? (
-                                    <DistanceInfo distance={distance} />
-                                ) : (
-                                    <div className="dotOverlay">
-                                        거리 <span className="number">{distance}</span>m
-                                    </div>
-                                )}
-                            </CustomOverlayMap>
-                        ))}
-                    <Polyline
-                        path={isdrawing ? [path[path.length - 1], mousePosition] : []}
-                        strokeWeight={3} // 선의 두께입니다
-                        strokeColor={"#db4040"} // 선의 색깔입니다
-                        strokeOpacity={0.5} // 선의 불투명도입니다 0에서 1 사이값이며 0에 가까울수록 투명합니다
-                        strokeStyle={"solid"} // 선의 스타일입니다
-                        onCreate={setMoveLine}
-                    />
-                    {isdrawing && (
-                        <CustomOverlayMap position={mousePosition} yAnchor={1} zIndex={2}>
+                    {switchCalcDist !== 1 && <CalculatePolylineDistanceStyle /> && path.length >= 1 ?
+                        <Polyline
+                            path={[...path, pathMovingPt]}
+                            strokeWeight={3} // 선의 두께입니다
+                            strokeColor={"#FF0080"} // 선의 색깔입니다
+                            strokeOpacity={1} // 선의 불투명도입니다 0에서 1 사이값이며 0에 가까울수록 투명합니다
+                            strokeStyle={"solid"} // 선의 스타일입니다
+                            onCreate={setDistPolyMovingPoint}
+                        />
+                        : <></>
+                    }
+
+                    {switchCalcDist && (
+                        <CustomOverlayMap position={pathMovingPt} yAnchor={1} zIndex={2}>
                             <div className="dotOverlay distanceInfo">
                                 총거리{" "}
                                 <span className="number">
-                                    {Math.round(clickDot.getLength() + moveLine.getLength())}
+                                    {/* {Math.round(distPolyMovingPoint.getLength() + pathMovingPt.getLength())} */}
                                 </span>
                                 m
                             </div>
                         </CustomOverlayMap>
                     )}
-                    </>}
-                    <button onClick={distToggle}>거리재기</button>
                 </Map>
-            </>
             }
+            <button onClick={calcDistToggle}>거리재기</button>
         </>
     )
 }

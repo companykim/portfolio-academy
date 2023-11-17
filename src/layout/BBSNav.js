@@ -2,8 +2,7 @@ import React from 'react';
 import {Navbar, Nav, Container} from 'react-bootstrap';
 
 export default function BBSNav() {
-    return (
-      <>
+    return (<>
         <Navbar bg="primary" data-bs-theme="dark">
           <Container>
             <Navbar.Brand href="/">대피소 안내해드려요</Navbar.Brand>
@@ -15,6 +14,6 @@ export default function BBSNav() {
             </Nav>
           </Container>
         </Navbar>
-        </>    
-    );
+        </>);
+
 }
