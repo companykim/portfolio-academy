@@ -135,7 +135,7 @@ def text_clean(text):
   return text  
 
 # DB 전달
-def to_dbeaver(NewsDate, NewsTitle, NewsLink) :
+def to_dbeaver(newsdate, newstitle, newslink) :
     conn = pymysql.connect(
         host='localhost'
         , user='root'
@@ -145,8 +145,8 @@ def to_dbeaver(NewsDate, NewsTitle, NewsLink) :
     )
     cur = conn.cursor()
     
-    for date,title,link in zip(NewsDate, NewsTitle, NewsLink):
-        sql = "INSERT IGNORE INTO news_crawling (id, NewsDate, NewsTitle, NewsLink) VALUES ({}, {}, {})".format("\""+date+"\"", "\""+title+"\"", "\""+link+"\"")
+    for date,title,link in zip(newsdate, newstitle, newslink):
+        sql = "INSERT IGNORE INTO news_crawling (newsdate, newstitle, newslink) VALUES ({}, {}, {})".format("\""+date+"\"", "\""+title+"\"", "\""+link+"\"")
         try : 
             cur.execute(sql)
         except Exception as e :
