@@ -8,7 +8,7 @@ export default function Manual() {
       <Card.Body>
         <blockquote className="blockquote mb-0">
           <p>
-            {' '}대피소 안내해드려요 팀은 정부에서 지정한 재난 대피 요령 메뉴얼을 
+            {' '}SafeHaven 팀은 정부에서 지정한 재난 대피 요령 메뉴얼을 
            사용자에게 제공하고 있습니다. {' '}
           </p>
           <footer className="blockquote-footer">
@@ -276,9 +276,6 @@ export default function Manual() {
             </a>
             <br/>적조
             </td>
-            <td align="center"></td>
-            <td align="center"></td>
-            <td align="center"></td>
         </tr>
       </tbody>
     </Table>

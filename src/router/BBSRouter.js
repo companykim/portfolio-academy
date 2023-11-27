@@ -8,10 +8,8 @@ import Register from 'components/Register';
 import MemberList from 'components/MemberList';
 import PostMng from 'components/post/PostMng';
 import Manual from 'components/post/Manual';
-import ShelterMap from 'components/shelter/ShelterMap';
-import ShelterMapOld from 'components/shelter/ShelterMapOld';
 import ShelterMapGoogle from 'components/shelter/ShelterMapGoogle';
-import SideBar from 'components/SideBar';
+import GoogleMapContainer from 'components/shelter/GoogleMapContainer';
 
 function BBSRouter() {
     return (<>
@@ -25,6 +23,8 @@ function BBSRouter() {
             <Route path="/member-list/:ownerId" element={<MemberList />} />
             {/* <Route path="/shelter" element={<ShelterMap />} /> */}
             <Route path="/shelter" element={<ShelterMapGoogle />} />
+            {/* <Route path="/shelter" element={<GoogleMapContainer />} /> */}
+
             <Route path="/manual" element={<Manual />} />
         </Routes>
     </>);

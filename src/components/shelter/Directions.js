@@ -1,9 +1,5 @@
 import React, { memo, useState, useEffect, useRef } from 'react';
 import { DirectionsService, DirectionsRenderer } from '@react-google-maps/api';
-import { forwardRef, useImperativeHandle } from 'react';
-
-// // 자식 컴포넌트
-// const findPath = forwardRef((props, ref) => {
 
 // 찍은 마커이기때문에 클릭 이벤트가 필요하다 -
 // 그 찍은 마커의 위치는 쉘터마커스의 shelter.shelterId안에 정보가 들어가있음 -> marker
@@ -52,11 +48,6 @@ const ViewDirections = (({ origin, destination }) => {
     );
 });
 
-// useImperativeHandle(ref, () => ({
-//     // 부모에서 사용하고 싶었던 함수
-//     Directions
-// }));
-// })
 
 // 성능상의 이점을 위한 memo
 export default memo(ViewDirections);

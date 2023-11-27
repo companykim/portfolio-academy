@@ -2,10 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { GoogleMap, MarkerF } from '@react-google-maps/api';
 import ViewDirections from './Directions';
 import ShelterMarkersGoogle from './ShelterMarkersGoogle';
-import { useRef } from 'react';
-import { render } from '@testing-library/react';
 import { MarkerClusterer } from '@react-google-maps/api';
-import AutoSearchPlaces from './AutoComplete ';
+import AutoSearchPlaces from './AutoSearchPlaces';
 import NearPlaces from './NearPlaces';
 
 const containerStyle = {
@@ -21,8 +19,10 @@ const myStyles = [
   },
 ];
 
-function ShelterMapGoogle() {
+function ShelterMapGoogle({ onZoomChanged }) {
   const [curPos, setCurPos] = useState(null);
+  const [map, setMap] = useState(null);
+
   const [zoomLv, setZoomLv] = useState(10); // 초기 줌 레벨 설정
 
   // 검색 장소
@@ -48,8 +48,6 @@ function ShelterMapGoogle() {
   // 토글 기능
   const [swichDirections, setSwichDirections] = useState(false);
 
-
-
   const toggleDirections = (e) => {
     e.preventDefault();
     // console.log("눌리긴 하니");
@@ -58,18 +56,15 @@ function ShelterMapGoogle() {
     setDestPoint(null)
   }
 
-  // 줌 레벨 바뀌니
-  const handleZoomChanged = (newZoom) => {
-    setZoomLv(newZoom);
-    console.log("newZoom...", newZoom);
-  };
-
 
   return (
     <>
       {curPos &&
         <GoogleMap
           mapContainerStyle={containerStyle}
+          ref={googleMap => {
+            setMap(googleMap)
+          }}
           center={{
             lat: 37.4854799,
             lng: 126.8981862
@@ -78,9 +73,9 @@ function ShelterMapGoogle() {
           }}
           zoom={zoomLv}
           options={{ disableDefaultUI: true, styles: myStyles }}
-          onZoomChanged={() => handleZoomChanged(zoomLv)} // 지도 확대/축소 속성 변경 시 시작되는 이벤트
-        // 줌 레벨에 따른 마커 표시 여부, zoomLv <= 10 면 마커 표시 
+
         >
+          {console.log("zoomLv 바뀌니", zoomLv)}
 
           {/* // 내 위치 띄우는 마커 */}
           <MarkerF
@@ -130,24 +125,19 @@ function ShelterMapGoogle() {
             <ViewDirections origin={{ lat: 37.4854799, lng: 126.8981862 }} destination={destPoint} />
             : <></>
           }
-          {/* 병원 */}
-          {/* <NearPlaces lat={37.4854799} lng={126.8981862} radius={2000} type={"hospital"} /> */}
-          {/* 약국 */}
-          {/* <NearPlaces lat={37.4854799} lng={126.8981862} radius={1000} type={"pharmacy"} /> */}
 
+          <NearPlaces lat={37.4854799} lng={126.8981862} radius={2000} setDestPoint={setDestPoint} />
 
-          <NearPlaces lat={37.4854799} lng={126.8981862} radius={1000}/>
         </GoogleMap>
       }
 
-      {/* <div>
-      <Sidebar width={320} ></Sidebar>
-      </div> */
-      }
-      <span />
-      <button className="btn" onClick={toggleDirections}>경로 탐색</button>
-     
-      <AutoSearchPlaces setPlacelating={setPlacelating} />
+      <div className="direct" style={{ position: 'absolute', right: '20px' }}>
+        <AutoSearchPlaces setPlacelating={setPlacelating} />
+        <span />
+        <button className='findbtn' onClick={toggleDirections} color='aquamarine'>경로 탐색</button>
+        <span />
+      </div>
+
 
     </>
   )

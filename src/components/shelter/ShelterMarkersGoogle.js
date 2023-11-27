@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { GoogleMap, MarkerF, InfoWindow, DirectionsService, DirectionsRenderer } from '@react-google-maps/api';
+import React, { useState } from 'react';
+import { MarkerF, InfoWindow } from '@react-google-maps/api';
 import { Fetch } from 'toolbox/Fetch';
-import {Dropdown, DropdownButton} from 'react-bootstrap';
+import { Dropdown, DropdownButton } from 'react-bootstrap';
 
 // 파라미터: 함수에서 정의되어 사용되는 변수
 export default function ShelterMarkersGoogle({ center, zoomLv, scale, clusterer, setDestPoint }) {
@@ -29,7 +29,6 @@ export default function ShelterMarkersGoogle({ center, zoomLv, scale, clusterer,
     function setShelterUsetype(item) {
         setUsageType(item)
     }
-
 
     // 대피소 목록 마커 출력
     function RenderSuccess(shelterList) {
@@ -79,12 +78,13 @@ export default function ShelterMarkersGoogle({ center, zoomLv, scale, clusterer,
 
     return (
         <>
+         <div style={{ position: 'absolute', top: '5px', left: '5px', zIndex: 1000 }}>
             <DropdownButton id="dropdown-basic-button" title="대피소 유형" onSelect={setShelterUsetype}>
                 <Dropdown.Item eventKey="지진-옥외">지진-옥외</Dropdown.Item>
                 <Dropdown.Item eventKey="지진-실내">지진-실내</Dropdown.Item>
-                <Dropdown.Item eventKey="이재민임시">이재민임시</Dropdown.Item>
-
+                <Dropdown.Item eventKey="이재민임시">이재민 임시</Dropdown.Item>
             </DropdownButton>
+         </div>
 
             {usageType &&
                 <Fetch uri={shelterUri} renderSuccess={RenderSuccess} />
